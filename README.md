@@ -21,8 +21,18 @@ Ready-to-use chat interface for iOS and Android React-Native apps
 - Fixing scroll when loading earlier messages
 - Various fixes and improvements by [@swapkats](https://github.com/swapkats), [@ianlin](https://github.com/ianlin), [@zxcpoiu](https://github.com/zxcpoiu), [@cnjon](https://github.com/cnjon)
 - Special thanks to [@yogiben](https://github.com/yogiben), [@koppelaar](https://github.com/koppelaar) & [@sethx](https://github.com/sethx) for their contributions
-#### 0.1.1
-- Description update in package.json
+
+#### 0.1.2
+- New prop: `dateLocale` - @gnl
+- New prop: `renderCustomDate` - @pcxiong
+- `center` position for messages (eg. for server messages) - @gnl
+- Method `setTextInputValue` - @wenkesj
+- Replace `lodash` with `deep-equal` - @austinkelleher
+
+#### 0.1.3
+- Fix initial `scrollToBottom` issue
+- Allow custom view for images - @aksonov
+
 
 ### Example
 See [GiftedMessengerExample/GiftedMessengerContainer.js](https://raw.githubusercontent.com/FaridSafi/react-native-gifted-messenger/master/GiftedMessengerExample/GiftedMessengerContainer.js)
@@ -59,11 +69,12 @@ See [GiftedMessengerExample/GiftedMessengerContainer.js](https://raw.githubuserc
 | onErrorButtonPress            | Function | Called when the re-send button is pressed                                  | Both     | (message, rowID) => {}           |
 | onImagePress                  | Function | Called when the image of a message is pressed                              | Both     | (rowData, rowID) => {}           |
 | onLoadEarlierMessages         | Function | Called when 'Load Earlier Message' button is pressed                       | Both     | (oldestMessage, callback) => {}  |
-| onMessageLongPress            | Function | Called when doing long press on a message                                  | Both     | () => {}                         |
+| onMessageLongPress            | Function | Called when doing long press on a message                                  | Both     | (rowData) => {}                       |
 | parseText                     | Boolean  | If the text has to be parsed with taskrabbit/react-native-parsed-text      | iOS      | true                             |
 | placeholder                   | String   | TextInput placeholder                                                      | Both     | 'Type a message...'              |
 | placeholderTextColor          | String   | TextInput text color placeholder                                           | Both     | '#ccc'                           |
 | renderCustomText              | Function | Implement your own text rendering                                          | Both     | (rowData) => {}                  |
+| renderCustomDate              | Function | Implement your own date rendering                                          | Both     | (rowData, previousData) => {}                  |
 | scrollAnimated                | Boolean  | do animation when scrolling                                                | Both     | true                             |
 | sendButtonText                | String   | 'Send' button label                                                        | Both     | 'Send'                           |
 | senderImage                   | Object   | Image of the sender                                                        | Both     | null                             |
@@ -84,6 +95,7 @@ var message = {
   position: 'left', // left for received messages, right for sent messages, center for server messages
   date: new Date(),
   view: null, // A custom Bubble view - the view will receive the message attributes as props
+  imageView: null, // Returns custom Image view to display image (avatar) for the message
   status: 'Seen', // if status is 'ErrorButton', a re-send button will be displayed
   // ...any attributes you want
 };

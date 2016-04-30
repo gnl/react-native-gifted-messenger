@@ -70,19 +70,20 @@ export default class Message extends Component {
   }
 
   renderImage(rowData, diffMessage, forceRenderImage, onImagePress) {
+    const ImageView = rowData.imageView || Image;
     if (rowData.image) {
       if (forceRenderImage) {
         diffMessage = null; // force rendering
       }
 
-      if (diffMessage === null || (diffMessage !== null && (rowData.name !== diffMessage.name || rowData.id !== diffMessage.id))) {
+      if (diffMessage === null || (diffMessage !== null && (rowData.name !== diffMessage.name || rowData.uniqueId !== diffMessage.uniqueId))) {
         if (typeof onImagePress === 'function') {
           return (
             <TouchableHighlight
               underlayColor='transparent'
               onPress={() => onImagePress(rowData)}
             >
-              <Image
+              <ImageView
                 source={rowData.image}
                 style={[styles.imagePosition, styles.image, (rowData.position === 'left' ? styles.imageLeft : styles.imageRight)]}
               />
@@ -90,7 +91,7 @@ export default class Message extends Component {
           );
         }
         return (
-          <Image
+          <ImageView
             source={rowData.image}
             style={[styles.imagePosition, styles.image, (rowData.position === 'left' ? styles.imageLeft : styles.imageRight)]}
           />

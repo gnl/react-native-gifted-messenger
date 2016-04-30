@@ -14,7 +14,7 @@ import Message from './Message';
 import GiftedSpinner from 'react-native-gifted-spinner';
 import moment from 'moment';
 import {setLocale} from './Locale';
-import _ from 'lodash';
+import deepEqual from 'deep-equal';
 import Button from 'react-native-button';
 
 class GiftedMessenger extends Component {
@@ -62,7 +62,7 @@ class GiftedMessenger extends Component {
 
     this.state = {
       dataSource: ds.cloneWithRows([]),
-      text: '',
+      text: props.text,
       disabled: true,
       height: new Animated.Value(this.listViewMaxHeight),
       appearAnim: new Animated.Value(0),
@@ -148,7 +148,7 @@ class GiftedMessenger extends Component {
       }
     }
 
-    if (_.isEqual(nextProps.messages, this.props.messages) === false) {
+    if (deepEqual(nextProps.messages, this.props.messages) === false) {
       let isAppended = null;
       if (nextProps.messages.length === this.props.messages.length) {
         // we assume that only a status has been changed
@@ -157,7 +157,7 @@ class GiftedMessenger extends Component {
         } else {
           isAppended = null;
         }
-      } else if (_.isEqual(nextProps.messages[nextProps.messages.length - 1], this.props.messages[this.props.messages.length - 1]) === false) {
+      } else if (deepEqual(nextProps.messages[nextProps.messages.length - 1], this.props.messages[this.props.messages.length - 1]) === false) {
         // we assume the messages were appended
         isAppended = true;
       } else {
@@ -285,16 +285,10 @@ class GiftedMessenger extends Component {
   }
 
   onChangeText(text) {
-    this.setState({ text });
-    if (text.trim().length > 0) {
-      this.setState({
-        disabled: false,
-      });
-    } else {
-      this.setState({
-        disabled: true,
-      });
-    }
+    this.setState({
+      text,
+      disabled: text.trim().length <= 0
+    });
 
     this.props.onChangeText(text);
   }
@@ -456,6 +450,11 @@ class GiftedMessenger extends Component {
   renderDate(rowData = {}) {
     let diffMessage = null;
     diffMessage = this.getPreviousMessage(rowData);
+
+    if (this.props.renderCustomDate) {
+      return this.props.renderCustomDate(rowData, diffMessage)
+    }
+
     if (rowData.date instanceof Date) {
       if (diffMessage === null) {
         return (
@@ -538,7 +537,7 @@ class GiftedMessenger extends Component {
           keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}
           keyboardDismissMode={this.props.keyboardDismissMode}
 
-          initialListSize={10}
+          initialListSize={this.props.messages.length}
           pageSize={this.props.messages.length}
 
           {...this.props}
@@ -546,6 +545,14 @@ class GiftedMessenger extends Component {
 
       </Animated.View>
     );
+  }
+
+  setTextInputValue(text) {
+    text = text || this.state.text
+    this.setState({
+      text,
+      disabled: text.trim().length <= 0,
+    });
   }
 
   renderTextInput() {
@@ -624,6 +631,7 @@ GiftedMessenger.defaultProps = {
   senderName: 'Sender',
   styles: {},
   submitOnReturn: false,
+  text: '',
   typingMessage: '',
 };
 
@@ -657,6 +665,7 @@ GiftedMessenger.propTypes = {
   placeholder: React.PropTypes.string,
   placeholderTextColor: React.PropTypes.string,
   renderCustomText: React.PropTypes.func,
+  renderCustomDate: React.PropTypes.func,
   scrollAnimated: React.PropTypes.bool,
   sendButtonText: React.PropTypes.string,
   senderImage: React.PropTypes.object,
