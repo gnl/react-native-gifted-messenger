@@ -157,12 +157,12 @@ class GiftedMessenger extends Component {
         } else {
           isAppended = null;
         }
-      } else if (deepEqual(nextProps.messages[nextProps.messages.length - 1], this.props.messages[this.props.messages.length - 1]) === false) {
-        // we assume the messages were appended
-        isAppended = true;
-      } else {
+      } else if (nextProps.messages.length > 0 && this.props.messages.length > 0 && nextProps.messages[nextProps.messages.length - 1].uniqueId === this.props.messages[this.props.messages.length - 1].uniqueId) {
         // we assume the messages were prepended
         isAppended = false;
+      } else {
+        // we assume the messages were appended
+        isAppended = true;
       }
       this.setMessages(nextProps.messages, isAppended);
     }
