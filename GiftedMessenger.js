@@ -66,6 +66,7 @@ class GiftedMessenger extends Component {
       disabled: true,
       height: new Animated.Value(this.listViewMaxHeight),
       appearAnim: new Animated.Value(0),
+      textInputHeight: textInputHeight,
     };
   }
 
@@ -79,16 +80,17 @@ class GiftedMessenger extends Component {
         flex: 1,
       },
       textInputContainer: {
-        height: 44,
+        // height: 44,
         borderTopWidth: 1 / PixelRatio.get(),
         borderColor: '#b2b2b2',
         flexDirection: 'row',
+        alignItems: 'flex-start',
         paddingLeft: 10,
         paddingRight: 10,
       },
       textInput: {
-        alignSelf: 'center',
-        height: 30,
+        // alignSelf: 'center',
+        // height: 30,
         width: 100,
         backgroundColor: '#FFF',
         flex: 1,
@@ -167,7 +169,7 @@ class GiftedMessenger extends Component {
       this.setMessages(nextProps.messages, isAppended);
     }
 
-    let textInputHeight = 44;
+    let textInputHeight = this.state.textInputHeight;
     if (nextProps.styles.hasOwnProperty('textInputContainer')) {
       textInputHeight = nextProps.styles.textInputContainer.height || textInputHeight;
     }
@@ -209,11 +211,18 @@ class GiftedMessenger extends Component {
       this.onChangeText('');
       this.props.handleSend(message);
     }
+    this.setState({
+      textInputHeight: 44,
+      height: new Animated.Value(this.props.maxHeight - 44),
+    });
   }
 
   onKeyboardWillHide() {
+    this.setState({
+      keyboardHeight: 0,
+    });
     Animated.timing(this.state.height, {
-      toValue: this.listViewMaxHeight,
+      toValue: this.props.maxHeight - this.state.textInputHeight,
       duration: 150,
     }).start();
   }
@@ -232,8 +241,12 @@ class GiftedMessenger extends Component {
   }
 
   onKeyboardWillShow(e) {
+    let keyboardHeight = e.endCoordinates.height;
+    this.setState({
+      keyboardHeight: keyboardHeight,
+    });
     Animated.timing(this.state.height, {
-      toValue: this.listViewMaxHeight - e.endCoordinates.height,
+      toValue: this.props.maxHeight - this.state.textInputHeight - keyboardHeight,
       duration: 200,
     }).start();
   }
@@ -558,13 +571,22 @@ class GiftedMessenger extends Component {
   renderTextInput() {
     if (this.props.hideTextInput === false) {
       return (
-        <View style={this.styles.textInputContainer}>
+        <View style={[this.styles.textInputContainer, {height: this.state.textInputHeight}]}>
           {this.props.leftControlBar}
           <TextInput
-            style={this.styles.textInput}
+            style={[this.styles.textInput, {height: this.state.textInputHeight - 14}]}
+            multiline={true}
             placeholder={this.props.placeholder}
             placeholderTextColor={this.props.placeholderTextColor}
             onChangeText={this.onChangeText}
+            onChange={(event) => {
+                let textInputHeight = Math.min(104, Math.max(44, event.nativeEvent.contentSize.height + 14));
+                this.setState({
+                  textInputHeight: textInputHeight,
+                  height: new Animated.Value(this.props.maxHeight - this.state.keyboardHeight - textInputHeight),
+                });
+              }
+            }
             value={this.state.text}
             autoFocus={this.props.autoFocus}
             returnKeyType={this.props.submitOnReturn ? 'send' : 'default'}
