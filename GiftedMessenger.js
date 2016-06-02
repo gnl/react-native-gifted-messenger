@@ -389,7 +389,7 @@ class GiftedMessenger extends Component {
   }
 
   renderLoadEarlierMessages() {
-    if (this.props.loadEarlierMessagesButton) {
+    if (this.props.loadEarlierMessagesButton && this.props.messages.length >= 10) {
       if (this.props.isLoadingEarlierMessages) {
         return (
           <View style={this.styles.loadEarlierMessages}>
