@@ -213,7 +213,7 @@ class GiftedMessenger extends Component {
     }
     this.setState({
       textInputHeight: 44,
-      height: new Animated.Value(this.props.maxHeight - 44),
+      height: new Animated.Value(this.props.maxHeight - this.state.keyboardHeight - 44),
     });
   }
 
